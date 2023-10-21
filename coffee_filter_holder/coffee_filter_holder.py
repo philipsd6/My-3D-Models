@@ -12,8 +12,8 @@ from ocp_vscode import *
 filter_chord = 210 * MM  # corner to corner at the top of the large filter
 wall_thickness = 2 * MM
 inside_depth = 30 * MM
-height = 35 * MM
-top_width = 170 * MM
+height = 45 * MM
+top_width = 180 * MM
 bottom_width = (top_width / 2 - height) * 2
 
 src_file_path = inspect.getfile(lambda: None)
@@ -79,11 +79,14 @@ with BuildPart() as filter_holder:
     extrude(amount=-wall_thickness / 2, mode=Mode.SUBTRACT)
 
 # Display the part in the GUI as it would be used with filters
+filter_holder.label = "filter-holder"
+filter_block.label = "filters"
+
 show(
     filter_holder,
     filter_block,
-    names=["filter-holder", "filter"],
     colors=["goldenrod", "silver"],
+    reset_camera=Camera.KEEP,
 )
 
 # Export the STL for printing
