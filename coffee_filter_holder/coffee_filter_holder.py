@@ -5,6 +5,7 @@ suitable for the 03 size filters, but can also hold 02 size filters as well. It 
 well when installed inside a cupboard door with a command strip or other adhesive.
 """
 
+import inspect
 from build123d import *
 from ocp_vscode import *
 
@@ -14,6 +15,9 @@ inside_depth = 30 * MM
 height = 35 * MM
 top_width = 170 * MM
 bottom_width = (top_width / 2 - height) * 2
+
+src_file_path = inspect.getfile(lambda: None)
+hario_logo = Path.joinpath(Path(src_file_path).parent, "hario-logo.svg")
 
 # These corners define the corners of the trapezoid.
 corners = [
@@ -68,23 +72,11 @@ with BuildPart() as filter_holder:
     )
 
     # Add the Hario logo to the front
-    logo_svg = import_svg("hario-logo.svg")
-    plane = Plane.XY.rotated(Vector(180, 0, 0))
-    with BuildSketch(plane) as logo_sketch:
-        # I don't know a better way to handle the disconnected shapes from SVG
-        make_face(logo_svg[:55])
-        make_face(logo_svg[69:])
+    logo_svg = import_svg(hario_logo)
+    with BuildSketch() as logo_sketch:
+        add(logo_svg.faces())
         scale(by=1 / 4)  # original is way too big...
-    extrude(amount=wall_thickness / 2, mode=Mode.SUBTRACT)
-
-    with BuildSketch(plane) as logo_neg_sketch:
-        # Now the internal holes of the "a" and "o" in the logo need to be added back. I
-        # really think there must be a better way to do this.
-        make_face(logo_svg[55:58])
-        make_face(logo_svg[58:68])
-        scale(by=1 / 4)
-    extrude(amount=wall_thickness / 2, mode=Mode.ADD)
-
+    extrude(amount=-wall_thickness / 2, mode=Mode.SUBTRACT)
 
 # Display the part in the GUI as it would be used with filters
 show(
